@@ -33,9 +33,8 @@ deploy:
     local_dir: target/release
     upload-dir: linux
     on:
-      rust: stable
       repo: dflemstr/semantic-editor
-      condition: "$TRAVIS_OS_NAME = linux"
+      condition: "$TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable"
   - provider: s3
     access_key_id: AKIAJHLREGPHOV3PUZDQ
     secret_access_key:
@@ -47,6 +46,5 @@ deploy:
     local_dir: target/release
     upload-dir: osx
     on:
-      rust: stable
       repo: dflemstr/semantic-editor
-      condition: "$TRAVIS_OS_NAME = osx"
+      condition: "$TRAVIS_OS_NAME = osx && $TRAVIS_RUST_VERSION = stable"
