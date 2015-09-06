@@ -8,8 +8,8 @@ os:
   - osx
 
 script:
-  - cargo build --verbose
-  - cargo test --verbose
+  - cargo build
+  - cargo test
 
 sudo: false
 
