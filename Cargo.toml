@@ -2,3 +2,6 @@
 name = "semantic-editor"
 version = "0.1.0"
 authors = ["David Flemström <david.flemstrom@gmail.com>"]
+
+[[bin]]
+name = "se"
