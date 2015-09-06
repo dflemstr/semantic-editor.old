@@ -7,4 +7,4 @@ authors = ["David Flemström <david.flemstrom@gmail.com>"]
 name = "se"
 
 [dependencies]
-rustty = "0.1.8"
+rustbox = "0.7.1"
