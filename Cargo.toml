@@ -5,3 +5,6 @@ authors = ["David Flemström <david.flemstrom@gmail.com>"]
 
 [[bin]]
 name = "se"
+
+[dependencies]
+rustty = "0.1.8"
