@@ -30,7 +30,6 @@ deploy:
       secure: pNMKx+qfRKWISIHHY1hQcDUdTRSr8POAg0oOcQqqehD/x0jcq4ao0A1K4sngwaRaXrqC+cBWvsjgYl9UquEJYCG4qAWR82BK/ZEjX/1a5iM90FIzzFP7FTR9bHlDlZyRpxzzNYGQSEW2+tKmu61zwZZn44LgF17dVWU6ctIdyowZNj0ernzcKUfFUg4iSwiYiHRL2mQmbjxH3iSgUkChrybq4hgTp5tnBgsatIxIECw5wn4gZhcOSOit5DwzAO+JeDjlCK0/hRQe++PbtCdFsxbGQ77eSSt2adOhjb/1w/miaDgLRJCsHfONbIcQvRWqgTtkdqW5lucLT9LZo4U2Qo5lNpIJopIyhtT+JaKPBtOsfdqJklGajldGUdjRQ0ienJqxKsu7Rd5lMoZ5LURHhG3CPifUhepH/zAri706N7y4Wpz+7c8uPE0MVx2Z6czJ0fM/gVAMDrBD5UBojhOrrw4o05U5ehu485FbRFWm35/R/RDS4hHTLOLouIaFI6hBDR4brOtK1aKjDUtZx3tICwnfCJlJzGzQDbEdrTWnpHPrmSbUmq+seS8aX/x/MLtu9lupLfmcFaGGvx2YUyImsZwAi72BbYS8gYH0bdj6d6semnVQt4HVEb14CDsqRP5tg8jyTI0cYovabmpox5V8fF0OKddPtoiIcRGcsqBbDwk=
     bucket: semantic-editor
     region: eu-central-1
-    endpoint: s3-eu-central-1.amazonaws.com
     skip_cleanup: true
     local_dir: target/deploy
     upload-dir: linux
@@ -43,7 +42,6 @@ deploy:
       secure: pNMKx+qfRKWISIHHY1hQcDUdTRSr8POAg0oOcQqqehD/x0jcq4ao0A1K4sngwaRaXrqC+cBWvsjgYl9UquEJYCG4qAWR82BK/ZEjX/1a5iM90FIzzFP7FTR9bHlDlZyRpxzzNYGQSEW2+tKmu61zwZZn44LgF17dVWU6ctIdyowZNj0ernzcKUfFUg4iSwiYiHRL2mQmbjxH3iSgUkChrybq4hgTp5tnBgsatIxIECw5wn4gZhcOSOit5DwzAO+JeDjlCK0/hRQe++PbtCdFsxbGQ77eSSt2adOhjb/1w/miaDgLRJCsHfONbIcQvRWqgTtkdqW5lucLT9LZo4U2Qo5lNpIJopIyhtT+JaKPBtOsfdqJklGajldGUdjRQ0ienJqxKsu7Rd5lMoZ5LURHhG3CPifUhepH/zAri706N7y4Wpz+7c8uPE0MVx2Z6czJ0fM/gVAMDrBD5UBojhOrrw4o05U5ehu485FbRFWm35/R/RDS4hHTLOLouIaFI6hBDR4brOtK1aKjDUtZx3tICwnfCJlJzGzQDbEdrTWnpHPrmSbUmq+seS8aX/x/MLtu9lupLfmcFaGGvx2YUyImsZwAi72BbYS8gYH0bdj6d6semnVQt4HVEb14CDsqRP5tg8jyTI0cYovabmpox5V8fF0OKddPtoiIcRGcsqBbDwk=
     bucket: semantic-editor
     region: eu-central-1
-    endpoint: s3-eu-central-1.amazonaws.com
     skip_cleanup: true
     local_dir: target/deploy
     upload-dir: osx
