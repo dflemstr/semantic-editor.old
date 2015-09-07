@@ -1,45 +1,47 @@
+extern crate fern;
+#[macro_use]
+extern crate log;
 extern crate rustbox;
+extern crate time;
+
+mod key;
 
 use rustbox::{Color,Event,Key,RustBox};
 
 fn main() {
+    setup_log();
+
     let rb = RustBox::init(Default::default()).unwrap();
     loop {
-        match rb.poll_event(false).unwrap() {
-            Event::KeyEvent(key) => {
-                if key == Some(Key::Char('q')) {
-                    break;
-                }
+        match rb.poll_event(true).unwrap() {
+            Event::KeyEventRaw(emod, key, character) => {
+                if let Some(press) = key::Press::from_raw(emod, key, character) {
 
-                rb.clear();
-                if let Some(k) = key {
-                    let visual = fmt_emacs_key(k);
+                    if press.symbol == key::Symbol::Char('q') {
+                        return;
+                    }
+
+                    rb.clear();
+                    let visual = format!("{}", press);
                     rb.print(0, 0, rustbox::RB_BOLD, Color::White, Color::Black, &visual);
+                } else {
+                    warn!("Unhandled key event {} {} {}", emod, key, character);
                 }
             },
-            _ => { }
+            _ => warn!("Unhandled event"),
         }
         rb.present();
     }
 }
 
-fn fmt_emacs_key(key: Key) -> String {
-    match key {
-        Key::Tab => String::from("tab"),
-        Key::Enter => String::from("return"),
-        Key::Esc => String::from("escape"),
-        Key::Backspace => String::from("backspace"),
-        Key::Right => String::from("right"),
-        Key::Left => String::from("left"),
-        Key::Up => String::from("up"),
-        Key::Down => String::from("down"),
-        Key::Delete => String::from("delete"),
-        Key::Home => String::from("home"),
-        Key::End => String::from("end"),
-        Key::PageUp => String::from("prior"),
-        Key::PageDown => String::from("next"),
-        Key::Char(c) => c.to_string(),
-        Key::Ctrl(c) => format!("C-{}", c),
-        Key::F(n) => format!("f{}", n),
-    }
+fn setup_log() {
+    let conf = fern::DispatchConfig {
+        format: Box::new(|msg: &str, level: &log::LogLevel, _location: &log::LogLocation| {
+            format!("[{}][{}] {}",
+                    time::now().strftime("%Y-%m-%d %H:%M:%S").unwrap(), level, msg)
+        }),
+        output: vec![fern::OutputConfig::file("se.log")],
+        level: log::LogLevelFilter::Trace,
+    };
+    fern::init_global_logger(conf, log::LogLevelFilter::Trace).unwrap();
 }
