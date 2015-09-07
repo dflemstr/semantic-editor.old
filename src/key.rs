@@ -159,7 +159,7 @@ fn press_from_raw_ctrl_char() {
     assert_eq!(result, Some(Press {
         ctrl: true,
         alt: false,
-        symbol: Symbol::Char('A'),
+        symbol: Symbol::Char('a'),
     }));
 }
 
@@ -169,7 +169,7 @@ fn press_from_raw_ctrl_alt_char() {
     assert_eq!(result, Some(Press {
         ctrl: true,
         alt: true,
-        symbol: Symbol::Char('A'),
+        symbol: Symbol::Char('a'),
     }));
 }
 
