@@ -43,7 +43,7 @@ impl Press {
                 symbol: Symbol::Char(c),
             })
         } else if key < 0x20 {
-            char::from_u32(key as u32 | 0b01000000).map(|c| Press {
+            char::from_u32(key as u32 | 0b01100000).map(|c| Press {
                 ctrl: true,
                 alt: alt,
                 symbol: Symbol::Char(c),

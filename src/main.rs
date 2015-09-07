@@ -11,11 +11,15 @@ use rustbox::{Color,Event,Key,RustBox};
 fn main() {
     setup_log();
 
-    let rb = RustBox::init(Default::default()).unwrap();
+    let rb = RustBox::init(rustbox::InitOptions {
+        input_mode: rustbox::InputMode::AltMouse,
+        buffer_stderr: true,
+    }).unwrap();
     loop {
         match rb.poll_event(true).unwrap() {
             Event::KeyEventRaw(emod, key, character) => {
                 if let Some(press) = key::Press::from_raw(emod, key, character) {
+                    debug!("Key event: {}", press);
 
                     if press.symbol == key::Symbol::Char('q') {
                         return;
@@ -25,10 +29,13 @@ fn main() {
                     let visual = format!("{}", press);
                     rb.print(0, 0, rustbox::RB_BOLD, Color::White, Color::Black, &visual);
                 } else {
-                    warn!("Unhandled key event {} {} {}", emod, key, character);
+                    warn!("Unhandled raw key event {} {} {}", emod, key, character);
                 }
             },
-            _ => warn!("Unhandled event"),
+            Event::KeyEvent(_) => panic!("Got parsed key event in raw mode"),
+            Event::ResizeEvent(w, h) => debug!("Resize event: {}×{}", w, h),
+            Event::MouseEvent(m, x, y) => debug!("Mouse event: {:?} at {},{}", m, x, y),
+            Event::NoEvent => debug!("No event"),
         }
         rb.present();
     }
