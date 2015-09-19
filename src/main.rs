@@ -52,8 +52,13 @@ fn main() {
 
 fn parse_cli_args<'n, 'a>() -> clap::ArgMatches<'n, 'a> {
     let about =
-        &format!("The Semantic Editor — Next generation editing (built for {})",
-                 version::target());
+        &format!("The Semantic Editor — Next generation editing\
+                \n\
+                \nBUILD DETAILS:\
+                \n    Target: {}\
+                \n    Committed: {}",
+                 version::target(),
+                 time::at_utc(version::committed_at()).rfc822());
     clap_app!(SemanticEditor =>
         (@setting GlobalVersion)
         (version: version::version())
