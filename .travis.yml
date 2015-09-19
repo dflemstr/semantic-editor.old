@@ -11,6 +11,10 @@ script:
   - cargo build
   - cargo test
 
+cache:
+  directories:
+    - $HOME/.cargo
+
 sudo: false
 
 matrix:
