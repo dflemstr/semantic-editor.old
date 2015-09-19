@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate clap;
 extern crate fern;
 #[macro_use]
 extern crate log;
@@ -8,13 +10,20 @@ mod key;
 
 use rustbox::{Color,Event,RustBox};
 
+mod version {
+    include!(concat!(env!("OUT_DIR"), "/version.rs"));
+}
+
 fn main() {
     setup_log();
+
+    parse_cli_args();
 
     let rb = RustBox::init(rustbox::InitOptions {
         input_mode: rustbox::InputMode::AltMouse,
         buffer_stderr: true,
     }).unwrap();
+
     loop {
         match rb.poll_event(true).unwrap() {
             Event::KeyEventRaw(emod, key, character) => {
@@ -39,6 +48,18 @@ fn main() {
         }
         rb.present();
     }
+}
+
+fn parse_cli_args<'n, 'a>() -> clap::ArgMatches<'n, 'a> {
+    let about =
+        &format!("The Semantic Editor — Next generation editing (built for {})",
+                 version::target());
+    clap_app!(SemanticEditor =>
+        (@setting GlobalVersion)
+        (version: version::version())
+        (about: about)
+        (@arg files: ... "File(s) to edit")
+    ).get_matches()
 }
 
 fn setup_log() {
