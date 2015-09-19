@@ -19,7 +19,7 @@ pub enum Symbol {
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub enum Special {
     Backspace,
-    F(u32),
+    F(u8),
     Insert,
     Delete,
     Home,
@@ -109,7 +109,7 @@ impl fmt::Display for Symbol {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             Symbol::Char(c) => f.write_char(c),
-            Symbol::Special(ref s) => fmt::Display::fmt(s, f),
+            Symbol::Special(ref s) => s.fmt(f),
         }
     }
 }

@@ -6,7 +6,7 @@ extern crate time;
 
 mod key;
 
-use rustbox::{Color,Event,Key,RustBox};
+use rustbox::{Color,Event,RustBox};
 
 fn main() {
     setup_log();
@@ -32,7 +32,7 @@ fn main() {
                     warn!("Unhandled raw key event {} {} {}", emod, key, character);
                 }
             },
-            Event::KeyEvent(_) => panic!("Got parsed key event in raw mode"),
+            Event::KeyEvent(_) => unreachable!("got parsed key event in raw mode"),
             Event::ResizeEvent(w, h) => debug!("Resize event: {}×{}", w, h),
             Event::MouseEvent(m, x, y) => debug!("Mouse event: {:?} at {},{}", m, x, y),
             Event::NoEvent => debug!("No event"),
