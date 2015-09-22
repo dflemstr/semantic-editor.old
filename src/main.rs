@@ -15,28 +15,33 @@ fn main() {
         input_mode: rustbox::InputMode::AltMouse,
         buffer_stderr: true,
     }).unwrap();
+
     loop {
-        match rb.poll_event(true).unwrap() {
+        let intent;
+        match rb.peek_event(time::Duration::milliseconds(1), true).unwrap() {
             Event::KeyEventRaw(emod, key, character) => {
                 if let Some(press) = key::Press::from_raw(emod, key, character) {
                     debug!("Key event: {}", press);
-
-                    if press.symbol == key::Symbol::Char('q') {
-                        return;
-                    }
-
-                    rb.clear();
-                    let visual = format!("{}", press);
-                    rb.print(0, 0, rustbox::RB_BOLD, Color::White, Color::Black, &visual);
+                    intent = intent_from_press(press);
                 } else {
                     warn!("Unhandled raw key event {} {} {}", emod, key, character);
+                    intent = None;
                 }
             },
             Event::KeyEvent(_) => panic!("Got parsed key event in raw mode"),
             Event::ResizeEvent(w, h) => debug!("Resize event: {}×{}", w, h),
             Event::MouseEvent(m, x, y) => debug!("Mouse event: {:?} at {},{}", m, x, y),
-            Event::NoEvent => debug!("No event"),
+            Event::NoEvent => trace!("No event"),
         }
+
+        rb.clear();
+
+        for y in 0..rb.height() {
+            for x in 0..rb.width() {
+                rb.print_char(x, y, rustbox::RB_NORMAL, Color::White, Color::Black, ' ');
+            }
+        }
+
         rb.present();
     }
 }
@@ -48,7 +53,7 @@ fn setup_log() {
                     time::now().strftime("%Y-%m-%d %H:%M:%S").unwrap(), level, msg)
         }),
         output: vec![fern::OutputConfig::file("se.log")],
-        level: log::LogLevelFilter::Trace,
+        level: log::LogLevelFilter::Debug,
     };
     fern::init_global_logger(conf, log::LogLevelFilter::Trace).unwrap();
 }

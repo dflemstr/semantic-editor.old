@@ -10,6 +10,8 @@ pub struct Press {
     pub symbol: Symbol,
 }
 
+// Rule: if it exists as Unicode code point >= 0x20, it's a `Char`,
+// otherwise `Special`.
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub enum Symbol {
     Char(char),
