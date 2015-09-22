@@ -142,7 +142,7 @@ fn parse_cli_args<'n, 'a>() -> clap::ArgMatches<'n, 'a> {
         (about: about)
         (@arg files: ... "File(s) to edit")
         (@subcommand update =>
-            (about: "checks and downloads updates to se")
+            (about: "Checks for and downloads updates to this program")
         )
     ).get_matches()
 }
