@@ -10,6 +10,8 @@ name = "se"
 [dependencies]
 clap = "1.4.0"
 fern = "0.3.5"
+hyper = "0.6.14"
 log = "0.3.2"
+md5 = "0.1.1"
 rustbox = "0.7.1"
 time = "0.1.32"
