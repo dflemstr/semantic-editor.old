@@ -22,6 +22,7 @@ before_install:
   - ./config -fPIC --prefix=$HOME/.local --openssldir=$HOME/.local/ssl
   - make
   - make install
+  - cd ..
   - export OPENSSL_LIB_DIR=$HOME/.local/lib
   - export OPENSSL_INCLUDE_DIR=$HOME/.local/include
   - export OPENSSL_STATIC=yes
