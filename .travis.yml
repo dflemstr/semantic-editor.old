@@ -19,11 +19,11 @@ before_install:
   - wget https://www.openssl.org/source/openssl-1.0.2d.tar.gz
   - tar xvf openssl-1.0.2d.tar.gz
   - cd openssl-1.0.2d
-  - ./config -fPIC --prefix=/usr/local --openssldir=/usr/local/ssl
+  - ./config -fPIC --prefix=$HOME/.local --openssldir=$HOME/.local/ssl
   - make
   - make install
-  - export OPENSSL_LIB_DIR=/usr/local/lib/
-  - export OPENSSL_INCLUDE_DIR=/usr/local/include
+  - export OPENSSL_LIB_DIR=$HOME/.local/lib
+  - export OPENSSL_INCLUDE_DIR=$HOME/.local/include
   - export OPENSSL_STATIC=yes
 
 sudo: false
