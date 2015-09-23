@@ -20,7 +20,7 @@ before_install:
   - tar xvf openssl-1.0.2d.tar.gz
   - cd openssl-1.0.2d
   - case "$TRAVIS_OS_NAME" in osx) target=darwin64-x86_64-cc ;; linux) target=linux-x86_64-clang ;; esac
-  - ./Configure "$target" -fPIC --prefix=$HOME/.local --openssldir=$HOME/.local/ssl
+  - ./Configure "$target" -fPIC -flto --prefix=$HOME/.local --openssldir=$HOME/.local/ssl
   - make
   - make install
   - cd ..

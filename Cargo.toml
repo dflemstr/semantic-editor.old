@@ -7,6 +7,9 @@ build = "build.rs"
 [[bin]]
 name = "se"
 
+[profile.release]
+lto = true
+
 [dependencies]
 clap = "1.4.0"
 fern = "0.3.5"
