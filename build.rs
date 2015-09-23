@@ -17,7 +17,7 @@ fn main() {
 
 fn generate() -> Result<(), Error> {
     let out_dir = try!(env::var("OUT_DIR"));
-    let dest_path = Path::new(&out_dir).join("version.rs");
+    let dest_path = Path::new(&out_dir).join("build_info.rs");
     let mut f = try!(File::create(&dest_path));
 
     let git_version = Command::new("git")
@@ -28,7 +28,7 @@ fn generate() -> Result<(), Error> {
         .args(&["show", "-s", "--format=%ct", "HEAD"])
         .output().ok().map(|o| drop_last_byte(o.stdout));
 
-    try!(f.write_all(b"extern crate time;\n\npub fn version() -> &'static str {\n    "));
+    try!(f.write_all(b"const VERSION: &'static str = "));
 
     match git_version {
         None => try!(f.write_all(b"env!(\"CARGO_PKG_VERSION\")")),
@@ -39,19 +39,19 @@ fn generate() -> Result<(), Error> {
         },
     };
 
-    try!(f.write_all(b"\n}\n\npub fn committed_at() -> time::Timespec {\n    "));
+    try!(f.write_all(b";\n\nconst COMMITTED_AT: ::time::Timespec = "));
     match git_commit_timestamp {
-        None => try!(f.write_all(b"time::Timespec { sec: 0, nsec: 0 }")),
+        None => try!(f.write_all(b"::time::Timespec { sec: 0, nsec: 0 }")),
         Some(t) => {
-            try!(f.write_all(b"time::Timespec { sec: "));
+            try!(f.write_all(b"::time::Timespec { sec: "));
             try!(f.write_all(&t));
             try!(f.write_all(b", nsec: 0 }"));
         },
     };
 
-    try!(f.write_all(b"\n}\n\npub fn target() -> &'static str {\n    \""));
+    try!(f.write_all(b";\n\nconst TARGET: &'static str = \""));
     try!(f.write_all(try!(env::var("TARGET")).as_bytes()));
-    try!(f.write_all(b"\"\n}\n"));
+    try!(f.write_all(b"\";\n"));
 
     Ok(())
 }

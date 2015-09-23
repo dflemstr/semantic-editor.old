@@ -8,6 +8,7 @@ extern crate md5;
 extern crate rustbox;
 extern crate time;
 
+mod build;
 mod key;
 
 use std::env;
@@ -15,30 +16,12 @@ use std::fs;
 use std::io;
 use std::path::Path;
 
-mod version {
-    include!(concat!(env!("OUT_DIR"), "/version.rs"));
-}
-
-mod os {
-    #[cfg(target_os="linux")]
-    const NAME: &'static str = "linux";
-
-    #[cfg(target_os="macos")]
-    const NAME: &'static str = "osx";
-
-    // Other OS'es not supported right now
-
-    pub fn name() -> &'static str {
-        NAME
-    }
-}
-
 fn main() {
     setup_log();
 
     let matches = parse_cli_args();
 
-    if let Some(u) = matches.subcommand_matches("update") {
+    if let Some(_) = matches.subcommand_matches("update") {
         update(&env::current_exe().unwrap().as_path())
     } else {
         edit()
@@ -59,11 +42,11 @@ fn update(executable_path: &Path) {
 
     let mut res = client.get("http://dflemstr.name/se")
         .header(header::IfNoneMatch::Items(vec![etag]))
-        .header(header::UserAgent(os::name().to_owned()))
+        .header(header::UserAgent(build::user_agent()))
         .send().unwrap();
 
     if res.status.is_success() {
-        let old_path = executable_path.with_file_name(&format!("se-{}", version::version()));
+        let old_path = executable_path.with_file_name(&format!("se-{}", build::version()));
         fs::rename(executable_path, &old_path).unwrap();
         println!("Note: old version saved as {}", old_path.to_str().unwrap());
 
@@ -134,11 +117,11 @@ fn parse_cli_args<'n, 'a>() -> clap::ArgMatches<'n, 'a> {
                 \nBUILD DETAILS:\
                 \n    Target: {}\
                 \n    Committed: {}",
-                 version::target(),
-                 time::at_utc(version::committed_at()).rfc822());
+                 build::target(),
+                 time::at_utc(build::committed_at()).rfc822());
     clap_app!(SemanticEditor =>
         (@setting GlobalVersion)
-        (version: version::version())
+        (version: build::version())
         (about: about)
         (@arg files: ... "File(s) to edit")
         (@subcommand update =>
