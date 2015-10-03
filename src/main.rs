@@ -80,17 +80,18 @@ fn edit() {
 }
 
 fn parse_cli_args<'n, 'a>() -> clap::ArgMatches<'n, 'a> {
+    let build_info = build::info().into_iter()
+        .map(|(k, v)| format!("{}: {}", k, v))
+        .collect::<Vec<_>>()
+        .join("\n    ");
     let about =
         &format!("The Semantic Editor — Next generation editing\
                 \n\
-                \nBUILD DETAILS:\
-                \n    Target: {}\
-                \n    Committed: {}",
-                 build::target(),
-                 time::at_utc(build::committed_at()).rfc822());
+                \nBUILD INFORMATION:\n    {}",
+                 build_info);
     clap_app!(SemanticEditor =>
         (@setting GlobalVersion)
-        (version: build::version())
+        (version: &build::version())
         (about: about)
         (@arg files: ... "File(s) to edit")
         (@subcommand update =>
