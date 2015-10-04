@@ -41,40 +41,42 @@ fn edit() {
     };
 
     loop {
-        match rb.poll_event(true).unwrap() {
-            Event::KeyEventRaw(emod, key, character) => {
-                if let Some(press) = key::Press::from_raw(emod, key, character) {
-                    debug!("Key event: {}", press);
+        loop {
+            match rb.peek_event(time::Duration::milliseconds(1), true).unwrap() {
+                Event::KeyEventRaw(emod, key, character) => {
+                    if let Some(press) = key::Press::from_raw(emod, key, character) {
+                        debug!("Key event: {}", press);
 
-                    if press.symbol == key::Symbol::Char('q') {
-                        return;
+                        if press.symbol == key::Symbol::Char('q') {
+                            return;
+                        } else {
+                            widget = Widget::Text {
+                                contents: format!("key press: {}", press),
+                            };
+                        }
                     } else {
-                        widget = Widget::Text {
-                            contents: format!("key press: {}", press),
-                        };
+                        warn!("Unhandled raw key event {} {} {}", emod, key, character);
                     }
-                } else {
-                    warn!("Unhandled raw key event {} {} {}", emod, key, character);
-                }
-            },
-            Event::KeyEvent(_) => unreachable!("got parsed key event in raw mode"),
-            Event::ResizeEvent(w, h) => {
-                debug!("Resize event: {}×{}", w, h);
-                widget = Widget::Text {
-                    contents: format!("resize: {}×{}", w, h),
-                };
-            },
-            Event::MouseEvent(m, x, y) => {
-                debug!("Mouse event: {:?} at {},{}", m, x, y);
-                widget = Widget::Text {
-                    contents: format!("mouse event: {:?} at {},{}", m, x, y),
-                };
-            },
-            Event::NoEvent => trace!("No event"),
-        };
+                },
+                Event::KeyEvent(_) => unreachable!("got parsed key event in raw mode"),
+                Event::ResizeEvent(w, h) => {
+                    debug!("Resize event: {}×{}", w, h);
+                    widget = Widget::Text {
+                        contents: format!("resize: {}×{}", w, h),
+                    };
+                },
+                Event::MouseEvent(m, x, y) => {
+                    debug!("Mouse event: {:?} at {},{}", m, x, y);
+                    widget = Widget::Text {
+                        contents: format!("mouse event: {:?} at {},{}", m, x, y),
+                    };
+                },
+                Event::NoEvent => break,
+            };
+        }
 
         rb.clear();
-        widget.render(&UI::new(&rb));
+        widget.render(&mut UI::new(&rb));
         rb.present();
     }
 }

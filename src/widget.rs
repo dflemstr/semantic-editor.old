@@ -1,4 +1,4 @@
-use ui::UI;
+use ui::{Color,UI};
 
 pub enum Widget {
     Text {
@@ -16,7 +16,10 @@ pub enum Orientation {
 }
 
 impl Widget {
-    pub fn render(&self, ui: &UI) {
+    pub fn render(&self, ui: &mut UI) {
+        ui.style().background_color = Color::Blue;
+        ui.style().foreground_color = Color::White;
+        ui.style().bold = true;
         match *self {
             Widget::Text { ref contents, .. } => ui.draw_text(contents),
             Widget::LinearLayout { .. } => panic!("Not implemented"),

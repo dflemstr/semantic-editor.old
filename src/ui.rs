@@ -2,11 +2,16 @@ use rustbox;
 
 pub struct UI<'a> {
     target: &'a rustbox::RustBox,
+    state: State,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct State {
     pub clip: Rect,
     pub style: Style,
 }
 
-#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Style {
     pub bold: bool,
     pub underline: bool,
@@ -23,7 +28,7 @@ pub struct Rect {
     pub bottom: usize,
 }
 
-#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Color {
     Default,
     Black,
@@ -40,31 +45,49 @@ impl<'a> UI<'a> {
     pub fn new(rustbox: &'a rustbox::RustBox) -> Self {
         UI {
             target: rustbox,
-            clip: Rect {
-                left: 0,
-                top: 0,
-                right: rustbox.width(),
-                bottom: rustbox.height(),
-            },
-            style: Style {
-                bold: false,
-                underline: false,
-                reverse: false,
-                foreground_color: Color::Default,
-                background_color: Color::Default,
+            state: State {
+                clip: Rect {
+                    left: 0,
+                    top: 0,
+                    right: rustbox.width(),
+                    bottom: rustbox.height(),
+                },
+                style: Style {
+                    bold: false,
+                    underline: false,
+                    reverse: false,
+                    foreground_color: Color::Default,
+                    background_color: Color::Default,
+                },
             },
         }
     }
 
+    pub fn style(&mut self) -> &mut Style {
+        &mut self.state.style
+    }
+
+    pub fn clip(&mut self) -> &mut Rect {
+        &mut self.state.clip
+    }
+
+    pub fn push(&self) -> UI {
+        UI::new(self.target)
+    }
+
     pub fn fill(&self) {
-        for y in self.clip.top..self.clip.bottom {
-            for x in self.clip.left..self.clip.right {
+        let State { ref clip, .. } = self.state;
+
+        for y in clip.top..clip.bottom {
+            for x in clip.left..clip.right {
                 self.plot(x, y);
             }
         }
     }
 
     pub fn draw_text(&self, contents: &str) {
+        let State { ref clip, .. } = self.state;
+
         self.fill();
 
         let mut col = 0;
@@ -72,15 +95,17 @@ impl<'a> UI<'a> {
 
         for c in contents.chars() {
             // TODO: handle newlines, rtl, wrap, etc
-            self.set(self.clip.left + col, self.clip.top + row, c);
+            self.set(clip.left + col, clip.top + row, c);
             col += 1;
         }
     }
 
     fn set(&self, x: usize, y: usize, c: char) {
-        let rb_style = self.style.to_rb_style();
-        let rb_fg_color = self.style.to_rb_fg_color();
-        let rb_bg_color = self.style.to_rb_bg_color();
+        let State { ref style, .. } = self.state;
+
+        let rb_style = style.to_rb_style();
+        let rb_fg_color = style.to_rb_fg_color();
+        let rb_bg_color = style.to_rb_bg_color();
         self.target.print_char(x, y, rb_style, rb_fg_color, rb_bg_color, c);
     }
 
