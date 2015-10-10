@@ -36,44 +36,44 @@ fn edit() {
         buffer_stderr: true,
     }).unwrap();
 
-    let mut widget = Widget::Text {
-        contents: "do something".to_owned(),
-    };
-
+    let mut info = "Do something".to_owned();
     loop {
-        loop {
-            match rb.peek_event(time::Duration::milliseconds(1), true).unwrap() {
-                Event::KeyEventRaw(emod, key, character) => {
-                    if let Some(press) = key::Press::from_raw(emod, key, character) {
-                        debug!("Key event: {}", press);
+        match rb.peek_event(time::Duration::milliseconds(1), true).unwrap() {
+            Event::KeyEventRaw(emod, key, character) => {
+                if let Some(press) = key::Press::from_raw(emod, key, character) {
+                    debug!("Key event: {}", press);
 
-                        if press.symbol == key::Symbol::Char('q') {
-                            return;
-                        } else {
-                            widget = Widget::Text {
-                                contents: format!("key press: {}", press),
-                            };
-                        }
+                    if press.symbol == key::Symbol::Char('q') {
+                        return;
                     } else {
-                        warn!("Unhandled raw key event {} {} {}", emod, key, character);
+                        info = format!("key press: {}", press);
                     }
-                },
-                Event::KeyEvent(_) => unreachable!("got parsed key event in raw mode"),
-                Event::ResizeEvent(w, h) => {
-                    debug!("Resize event: {}×{}", w, h);
-                    widget = Widget::Text {
-                        contents: format!("resize: {}×{}", w, h),
-                    };
-                },
-                Event::MouseEvent(m, x, y) => {
-                    debug!("Mouse event: {:?} at {},{}", m, x, y);
-                    widget = Widget::Text {
-                        contents: format!("mouse event: {:?} at {},{}", m, x, y),
-                    };
-                },
-                Event::NoEvent => break,
-            };
-        }
+                } else {
+                    warn!("Unhandled raw key event {} {} {}", emod, key, character);
+                }
+            },
+            Event::KeyEvent(_) => unreachable!("got parsed key event in raw mode"),
+            Event::ResizeEvent(w, h) => {
+                debug!("Resize event: {}×{}", w, h);
+                info = format!("resize: {}×{}", w, h);
+            },
+            Event::MouseEvent(m, x, y) => {
+                debug!("Mouse event: {:?} at {},{}", m, x, y);
+                info = format!("mouse event: {:?} at {},{}", m, x, y);
+            },
+            Event::NoEvent => (),
+        };
+
+        let widget = Widget::LinearLayout {
+            orientation: Orientation::Horizontal,
+            children: vec![
+                (1, Widget::Text {
+                    contents: info.clone(),
+                }),
+                (2, Widget::Text {
+                    contents: "foo".to_owned(),
+                })],
+        };
 
         rb.clear();
         widget.render(&mut UI::new(&rb));
