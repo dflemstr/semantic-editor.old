@@ -32,7 +32,8 @@ sudo: false
 
 matrix:
   allow_failures:
-    - rust: nightly
+    - rust: stable
+    - rust: beta
     - os: osx
 
 before_deploy:
@@ -52,7 +53,7 @@ deploy:
     upload-dir: linux
     on:
       repo: dflemstr/semantic-editor
-      condition: "$TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = stable"
+      condition: "$TRAVIS_OS_NAME = linux && $TRAVIS_RUST_VERSION = nightly"
   - provider: s3
     access_key_id: AKIAJHLREGPHOV3PUZDQ
     secret_access_key:
@@ -64,4 +65,4 @@ deploy:
     upload-dir: osx
     on:
       repo: dflemstr/semantic-editor
-      condition: "$TRAVIS_OS_NAME = osx && $TRAVIS_RUST_VERSION = stable"
+      condition: "$TRAVIS_OS_NAME = osx && $TRAVIS_RUST_VERSION = nightly"
