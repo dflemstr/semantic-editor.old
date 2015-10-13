@@ -5,6 +5,8 @@ extern crate hyper;
 #[macro_use]
 extern crate log;
 extern crate md5;
+extern crate mio;
+extern crate mioco;
 extern crate rustbox;
 extern crate time;
 
@@ -27,58 +29,22 @@ fn main() {
 }
 
 fn edit() {
-    use rustbox::{Event,RustBox};
-    use ui::UI;
-    use widget::{Orientation,Widget};
+    use std::io::{Read, Write};
+    mioco::start(move |mioco| {
+        let mut stdin = mioco.wrap(mio::fd::stdin());
+        let stdout = mioco.wrap(mio::fd::stdout());
 
-    let rb = RustBox::init(rustbox::InitOptions {
-        input_mode: rustbox::InputMode::AltMouse,
-        buffer_stderr: true,
-    }).unwrap();
+        let mut buf = [0u8; 1024 * 16];
 
-    let mut info = "Do something".to_owned();
-    loop {
-        match rb.peek_event(time::Duration::milliseconds(1), true).unwrap() {
-            Event::KeyEventRaw(emod, key, character) => {
-                if let Some(press) = key::Press::from_raw(emod, key, character) {
-                    debug!("Key event: {}", press);
-
-                    if press.symbol == key::Symbol::Char('q') {
-                        return;
-                    } else {
-                        info = format!("key press: {}", press);
-                    }
-                } else {
-                    warn!("Unhandled raw key event {} {} {}", emod, key, character);
-                }
-            },
-            Event::KeyEvent(_) => unreachable!("got parsed key event in raw mode"),
-            Event::ResizeEvent(w, h) => {
-                debug!("Resize event: {}×{}", w, h);
-                info = format!("resize: {}×{}", w, h);
-            },
-            Event::MouseEvent(m, x, y) => {
-                debug!("Mouse event: {:?} at {},{}", m, x, y);
-                info = format!("mouse event: {:?} at {},{}", m, x, y);
-            },
-            Event::NoEvent => (),
-        };
-
-        let widget = Widget::LinearLayout {
-            orientation: Orientation::Horizontal,
-            children: vec![
-                (1, Widget::Text {
-                    contents: info.clone(),
-                }),
-                (2, Widget::Text {
-                    contents: "foo".to_owned(),
-                })],
-        };
-
-        rb.clear();
-        widget.render(&mut UI::new(&rb));
-        rb.present();
-    }
+        loop {
+            let size = try!(stdin.read(&mut buf));
+            if size == 0 {
+                return Ok(()); // eof
+            }
+            try!(stdin.write_all(&mut buf[0..size]));
+        }
+    });
+    println!("Exiting!");
 }
 
 fn parse_cli_args<'n, 'a>() -> clap::ArgMatches<'n, 'a> {

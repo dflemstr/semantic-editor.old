@@ -24,7 +24,7 @@ git = "https://github.com/dflemstr/mio.git"
 branch = "fd"
 
 [dependencies.mioco]
-git = "https://github.com/dpc/mioco.git"
+git = "https://github.com/dflemstr/mioco.git"
 
 [build-dependencies]
 rustc_version = "0.1.4"
