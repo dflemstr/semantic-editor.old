@@ -32,7 +32,7 @@ fn edit() {
     use std::io::{Read, Write};
     mioco::start(move |mioco| {
         let mut stdin = mioco.wrap(mio::fd::stdin());
-        let stdout = mioco.wrap(mio::fd::stdout());
+        let mut stdout = mioco.wrap(mio::fd::stdout());
 
         let mut buf = [0u8; 1024 * 16];
 
@@ -41,7 +41,7 @@ fn edit() {
             if size == 0 {
                 return Ok(()); // eof
             }
-            try!(stdin.write_all(&mut buf[0..size]));
+            try!(stdout.write_all(&mut buf[0..size]));
         }
     });
     println!("Exiting!");
