@@ -7,11 +7,13 @@ extern crate log;
 extern crate md5;
 extern crate mio;
 extern crate mioco;
+extern crate nix;
 extern crate rustbox;
 extern crate time;
 
 mod build;
 mod key;
+mod term;
 mod ui;
 mod update;
 mod widget;
@@ -29,22 +31,10 @@ fn main() {
 }
 
 fn edit() {
-    use std::io::{Read, Write};
     mioco::start(move |mioco| {
-        let mut stdin = mioco.wrap(mio::fd::stdin());
-        let mut stdout = mioco.wrap(mio::fd::stdout());
-
-        let mut buf = [0u8; 1024 * 16];
-
-        loop {
-            let size = try!(stdin.read(&mut buf));
-            if size == 0 {
-                return Ok(()); // eof
-            }
-            try!(stdout.write_all(&mut buf[0..size]));
-        }
+        term::Term::new(mioco).unwrap();
+        Ok(())
     });
-    println!("Exiting!");
 }
 
 fn parse_cli_args<'n, 'a>() -> clap::ArgMatches<'n, 'a> {

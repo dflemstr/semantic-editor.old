@@ -16,15 +16,11 @@ fern = "0.3.5"
 hyper = "0.6.14"
 log = "0.3.2"
 md5 = "0.1.1"
+mio = "0.4.3"
+mioco = { git = "https://github.com/dpc/mioco.git" }
+nix = "0.4.1"
 rustbox = "0.7.1"
 time = "0.1.32"
-
-[dependencies.mio]
-git = "https://github.com/dflemstr/mio.git"
-branch = "fd"
-
-[dependencies.mioco]
-git = "https://github.com/dflemstr/mioco.git"
 
 [build-dependencies]
 rustc_version = "0.1.4"
