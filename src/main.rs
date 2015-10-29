@@ -60,9 +60,9 @@ fn parse_cli_args<'n, 'a>() -> clap::ArgMatches<'n, 'a> {
 
 fn setup_log() {
     let conf = fern::DispatchConfig {
-        format: Box::new(|msg: &str, level: &log::LogLevel, _location: &log::LogLocation| {
-            format!("[{}][{}] {}",
-                    time::now().strftime("%Y-%m-%d %H:%M:%S").unwrap(), level, msg)
+        format: Box::new(|msg: &str, level: &log::LogLevel, location: &log::LogLocation| {
+            format!("[{}] [{}] {}",
+                    level, location.module_path(), msg)
         }),
         output: vec![fern::OutputConfig::file("se.log")],
         level: log::LogLevelFilter::Trace,
