@@ -32,10 +32,10 @@ fn generate() -> Result<(), Error> {
 
     let target = try!(env::var("TARGET"));
     let mut target_parts = target.split("-");
-    let arch = target_parts.next().unwrap();
-    let vendor = target_parts.next().unwrap();
-    let system = target_parts.next().unwrap();
-    let abi = target_parts.next().unwrap();
+    let arch = target_parts.next().unwrap_or("");
+    let vendor = target_parts.next().unwrap_or("");
+    let system = target_parts.next().unwrap_or("");
+    let abi = target_parts.next().unwrap_or("");
 
     let rust_version = format!("{}", rustc_version::version());
 
