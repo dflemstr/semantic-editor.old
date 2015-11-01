@@ -23,7 +23,10 @@ pub fn info() -> Vec<(String, String)> {
     result.push(("os".to_owned(), OS_NAME.to_owned()));
     result.push(("arch".to_owned(), ARCH.to_owned()));
     result.push(("vendor".to_owned(), VENDOR.to_owned()));
-    result.push(("abi".to_owned(), ABI.to_owned()));
+
+    if let Some(abi) = ABI {
+        result.push(("abi".to_owned(), abi.to_owned()));
+    }
 
     result
 }

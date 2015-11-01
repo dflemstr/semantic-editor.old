@@ -24,66 +24,50 @@ fn generate() -> Result<(), Error> {
 
     let git_version = Command::new("git")
         .args(&["rev-parse", "--short", "HEAD"])
-        .output().ok().map(|o| drop_last_byte(o.stdout));
+        .output().ok()
+        .map(|o| String::from_utf8(drop_last_byte(o.stdout)).unwrap());
 
     let git_commit_timestamp = Command::new("git")
         .args(&["show", "-s", "--format=%ct", "HEAD"])
-        .output().ok().map(|o| drop_last_byte(o.stdout));
+        .output().ok()
+        .map(|o| String::from_utf8(drop_last_byte(o.stdout)).unwrap());
 
     let target = try!(env::var("TARGET"));
     let mut target_parts = target.split("-");
-    let arch = target_parts.next().unwrap_or("");
-    let vendor = target_parts.next().unwrap_or("");
-    let system = target_parts.next().unwrap_or("");
-    let abi = target_parts.next().unwrap_or("");
+    let arch = target_parts.next().unwrap();
+    let vendor = target_parts.next().unwrap();
+    let system = target_parts.next().unwrap();
+    let abi = target_parts.next();
 
     let rust_version = format!("{}", rustc_version::version());
 
-    try!(f.write_all(b"const COMMIT: Option<&'static str> = "));
+    try!(write!(f, "const COMMIT: Option<&'static str> = "));
     match git_version {
-        None => try!(f.write_all(b"None")),
-        Some(commit) => {
-            try!(f.write_all(b"Some(\""));
-            try!(f.write_all(&commit));
-            try!(f.write_all(b"\")"));
-        },
+        None => try!(write!(f, "None")),
+        Some(commit) => try!(write!(f, "Some(\"{}\")", commit)),
     };
-    try!(f.write_all(b";\n\n"));
+    try!(write!(f, ";\n\n"));
 
-    try!(f.write_all(b"const COMMITTED_AT: Option<::time::Timespec> = "));
+    try!(write!(f, "const COMMITTED_AT: Option<::time::Timespec> = "));
     match git_commit_timestamp {
-        None => try!(f.write_all(b"None")),
-        Some(t) => {
-            try!(f.write_all(b"Some(::time::Timespec { sec: "));
-            try!(f.write_all(&t));
-            try!(f.write_all(b", nsec: 0 })"));
-        },
+        None => try!(write!(f, "None")),
+        Some(t) => try!(write!(f, "Some(::time::Timespec {{ sec: {}, nsec: 0 }})", t)),
     };
-    try!(f.write_all(b";\n\n"));
+    try!(write!(f, ";\n\n"));
 
-    try!(f.write_all(b"const TARGET: &'static str = \""));
-    try!(f.write_all(target.as_bytes()));
-    try!(f.write_all(b"\";\n\n"));
+    try!(write!(f, "const TARGET: &'static str = \"{}\";\n\n", target));
+    try!(write!(f, "const ARCH: &'static str = \"{}\";\n\n", arch));
+    try!(write!(f, "const VENDOR: &'static str = \"{}\";\n\n", vendor));
+    try!(write!(f, "const SYSTEM: &'static str = \"{}\";\n\n", system));
 
-    try!(f.write_all(b"const ARCH: &'static str = \""));
-    try!(f.write_all(arch.as_bytes()));
-    try!(f.write_all(b"\";\n\n"));
+    try!(write!(f, "const ABI: Option<&'static str> = "));
+    match abi {
+        Some(a) => try!(write!(f, "Some(\"{}\")", a)),
+        None => try!(write!(f, "None")),
+    }
+    try!(write!(f, ";\n\n"));
 
-    try!(f.write_all(b"const VENDOR: &'static str = \""));
-    try!(f.write_all(vendor.as_bytes()));
-    try!(f.write_all(b"\";\n\n"));
-
-    try!(f.write_all(b"const SYSTEM: &'static str = \""));
-    try!(f.write_all(system.as_bytes()));
-    try!(f.write_all(b"\";\n\n"));
-
-    try!(f.write_all(b"const ABI: &'static str = \""));
-    try!(f.write_all(abi.as_bytes()));
-    try!(f.write_all(b"\";\n\n"));
-
-    try!(f.write_all(b"const RUST_VERSION: &'static str = \""));
-    try!(f.write_all(rust_version.as_bytes()));
-    try!(f.write_all(b"\";\n"));
+    try!(write!(f, "const RUST_VERSION: &'static str = \"{}\";\n", rust_version));
 
     Ok(())
 }
