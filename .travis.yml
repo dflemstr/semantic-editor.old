@@ -37,7 +37,6 @@ matrix:
   allow_failures:
     - rust: stable
     - rust: beta
-    - os: osx
 
 before_deploy:
   - cargo build --release
