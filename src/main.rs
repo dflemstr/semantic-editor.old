@@ -3,7 +3,10 @@ extern crate clap;
 extern crate fern;
 extern crate hyper;
 #[macro_use]
+extern crate lazy_static;
+#[macro_use]
 extern crate log;
+extern crate libc;
 extern crate md5;
 extern crate mio;
 extern crate mioco;
@@ -32,8 +35,12 @@ fn main() {
 
 fn edit() {
     mioco::start(move |mioco| {
-        term::Term::new(mioco).unwrap();
-        Ok(())
+        let t = term::Term::new(mioco).unwrap();
+
+        loop {
+            let event = t.events_recv.read();
+            info!("Event: {:?}", event);
+        }
     });
 }
 
