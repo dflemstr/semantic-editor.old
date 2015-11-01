@@ -17,7 +17,7 @@ pub struct Term {
     _capture: captured::CapturedTerm,
     _tty_file: fs::File,
     tty: mioco::EventSource<mio::Io>,
-    pub events_recv: mioco::EventSource<mioco::MailboxInnerEnd<Event>>,
+    events_recv: mioco::EventSource<mioco::MailboxInnerEnd<Event>>,
 }
 
 #[derive(Debug)]
@@ -77,6 +77,10 @@ impl Term {
         });
 
         Ok(term)
+    }
+
+    pub fn events(&self) -> &mioco::EventSource<mioco::MailboxInnerEnd<Event>> {
+        &self.events_recv
     }
 }
 

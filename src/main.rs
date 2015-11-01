@@ -38,7 +38,7 @@ fn edit() {
         let t = term::Term::new(mioco).unwrap();
 
         loop {
-            let event = t.events_recv.read();
+            let event = t.events().read();
             info!("Event: {:?}", event);
         }
     });
