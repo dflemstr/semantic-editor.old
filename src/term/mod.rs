@@ -71,8 +71,8 @@ impl Term {
         mioco.spawn(move |mioco| {
             let resize_recv = mioco.wrap(resize_recv);
             loop {
-                let r = resize_recv.read();
-                events_send.send(Event::Resized(r.0, r.1));
+                let (width, height) = resize_recv.read();
+                events_send.send(Event::Resized(width, height));
             }
         });
 
