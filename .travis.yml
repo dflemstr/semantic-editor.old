@@ -42,7 +42,7 @@ matrix:
 before_deploy:
   - cargo build --release
   - mkdir target/deploy
-  - target/release/se help
+  - target/release/se help || true
   - cp target/release/se target/deploy/se
 
 deploy:
