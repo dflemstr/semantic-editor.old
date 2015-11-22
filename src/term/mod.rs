@@ -56,10 +56,7 @@ impl Term {
         let (events_send, events_recv) = mioco::mailbox();
         let (resize_send, resize_recv) = mioco::mailbox();
 
-        // Unsafe because TTY_LOCK must be held
-        unsafe {
-            try!(resize::send_resizes_to(tty_fd, resize_send))
-        };
+        try!(resize::send_resizes_to(tty_fd, mioco, resize_send));
 
         let term = Term {
             _capture: capture,

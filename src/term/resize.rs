@@ -1,51 +1,55 @@
 use libc;
 
+use mio;
+
 use mioco;
 
 use nix;
 use nix::sys::signal;
 
+use sentinel;
+
+use std::any;
 use std::mem;
 use std::os::unix;
-use std::sync;
+use std::sync::atomic;
 
-lazy_static! {
-    static ref SIGNAL_CONTEXT: sync::RwLock<Option<SignalContext>> =
-        sync::RwLock::new(None);
-}
+static RESIZED: atomic::AtomicBool = atomic::ATOMIC_BOOL_INIT;
 
-struct SignalContext {
+pub fn send_resizes_to(
     tty_fd: unix::io::RawFd,
-    mailbox: mioco::MailboxOuterEnd<(usize, usize)>,
-}
-
-pub unsafe fn send_resizes_to(
-    tty_fd: unix::io::RawFd,
-    mailbox: mioco::MailboxOuterEnd<(usize, usize)>) -> Result<(), nix::Error> {
-
-    *SIGNAL_CONTEXT.write().unwrap() = Some(SignalContext {
-        tty_fd: tty_fd,
-        mailbox: mailbox,
-    });
+    mioco: &mut mioco::MiocoHandle,
+    size_mailbox: mioco::MailboxOuterEnd<(usize, usize)>) -> Result<(), nix::Error> {
 
     let resize_action = signal::SigAction::new(
         handle_resize, signal::SockFlag::empty(), signal::SigSet::empty());
 
-    try!(signal::sigaction(signal::SIGWINCH, &resize_action));
+    unsafe {
+        try!(signal::sigaction(signal::SIGWINCH, &resize_action))
+    };
+
+    mioco.spawn(move |mioco| {
+        info!("Listening for resize events...");
+        loop {
+            if RESIZED.compare_and_swap(true, false, atomic::Ordering::SeqCst) {
+                let mut ws: ffi::WinSize;
+                unsafe {
+                    ws = mem::uninitialized();
+                    nix::from_ffi(ffi::ioctl(tty_fd, ffi::TIOCGWINSZ, &mut ws)).unwrap();
+                }
+                info!("Resized: {}x{}", ws.ws_col, ws.ws_row);
+
+                size_mailbox.send((ws.ws_col as usize, ws.ws_row as usize));
+            }
+            mioco.sleep(10);
+        }
+    });
 
     Ok(())
 }
 
 extern fn handle_resize(_: libc::c_int) {
-    let context = SIGNAL_CONTEXT.read().unwrap();
-
-    if let Some(ref c) = *context {
-        let mut ws: ffi::WinSize = unsafe { mem::uninitialized() };
-        unsafe {
-            nix::from_ffi(ffi::ioctl(c.tty_fd, ffi::TIOCGWINSZ, &mut ws)).unwrap()
-        };
-        c.mailbox.send((ws.ws_col as usize, ws.ws_row as usize));
-    }
+    RESIZED.store(true, atomic::Ordering::SeqCst);
 }
 
 mod ffi {

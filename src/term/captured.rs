@@ -30,10 +30,7 @@ impl Drop for CapturedTerm {
 }
 
 fn config_tios(tios: &mut termios::Termios) {
-    use nix::sys::termios::{
-        IGNBRK, BRKINT, PARMRK, ISTRIP, INLCR, IGNCR, ICRNL, IXON, OPOST, ECHO,
-        ECHONL, ICANON, ISIG, IEXTEN, CSIZE, PARENB, CS8, VMIN, VTIME
-    };
+    use nix::sys::termios::*;
 
     tios.c_iflag = tios.c_iflag & !(IGNBRK | BRKINT | PARMRK | ISTRIP |
                                     INLCR | IGNCR | ICRNL | IXON);

@@ -72,7 +72,7 @@ fn setup_log() {
                     level, location.module_path(), msg)
         }),
         output: vec![fern::OutputConfig::file("se.log")],
-        level: log::LogLevelFilter::Trace,
+        level: log::LogLevelFilter::Debug,
     };
     fern::init_global_logger(conf, log::LogLevelFilter::Trace).unwrap();
 }
