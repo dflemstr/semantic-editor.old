@@ -7,8 +7,6 @@ use mioco;
 use nix;
 use nix::sys::signal;
 
-use sentinel;
-
 use std::any;
 use std::mem;
 use std::os::unix;
@@ -29,7 +27,6 @@ pub fn send_resizes_to(
     };
 
     mioco.spawn(move |mioco| {
-        info!("Listening for resize events...");
         loop {
             if RESIZED.compare_and_swap(true, false, atomic::Ordering::SeqCst) {
                 let mut ws: ffi::WinSize;
@@ -37,7 +34,6 @@ pub fn send_resizes_to(
                     ws = mem::uninitialized();
                     nix::from_ffi(ffi::ioctl(tty_fd, ffi::TIOCGWINSZ, &mut ws)).unwrap();
                 }
-                info!("Resized: {}x{}", ws.ws_col, ws.ws_row);
 
                 size_mailbox.send((ws.ws_col as usize, ws.ws_row as usize));
             }
