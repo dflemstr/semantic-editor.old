@@ -15,7 +15,6 @@ static TTY_LOCK: atomic::AtomicBool = atomic::ATOMIC_BOOL_INIT;
 
 pub struct Term {
     _capture: captured::CapturedTerm,
-    tty: mioco::EventSource<mio::Io>,
     events_recv: mioco::EventSource<mioco::MailboxInnerEnd<Event>>,
 }
 
@@ -48,7 +47,6 @@ impl Term {
 
         let tty_fd = tty_file.into_raw_fd();
         try!(fcntl::fcntl(tty_fd, fcntl::FcntlArg::F_SETFL(fcntl::O_NONBLOCK)));
-        let tty = mioco.wrap(mio::Io::from_raw_fd(tty_fd));
 
         let capture = try!(captured::CapturedTerm::create(tty_fd));
 
@@ -56,12 +54,6 @@ impl Term {
         let (resize_send, resize_recv) = mioco::mailbox();
 
         try!(resize::send_resizes_to(tty_fd, mioco, resize_send));
-
-        let term = Term {
-            _capture: capture,
-            tty: tty,
-            events_recv: mioco.wrap(events_recv),
-        };
 
         mioco.spawn(move |mioco| {
             let resize_recv = mioco.wrap(resize_recv);
@@ -71,7 +63,10 @@ impl Term {
             }
         });
 
-        Ok(term)
+        Ok(Term {
+            _capture: capture,
+            events_recv: mioco.wrap(events_recv),
+        })
     }
 
     pub fn events(&self) -> &mioco::EventSource<mioco::MailboxInnerEnd<Event>> {
