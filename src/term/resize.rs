@@ -16,7 +16,6 @@ static RESIZED: atomic::AtomicBool = atomic::ATOMIC_BOOL_INIT;
 
 pub fn send_resizes_to(
     tty_fd: unix::io::RawFd,
-    mioco: &mut mioco::MiocoHandle,
     size_mailbox: mioco::MailboxOuterEnd<(usize, usize)>) -> Result<(), nix::Error> {
 
     let resize_action = signal::SigAction::new(
@@ -26,7 +25,7 @@ pub fn send_resizes_to(
         try!(signal::sigaction(signal::SIGWINCH, &resize_action))
     };
 
-    mioco.spawn(move |mioco| {
+    mioco::spawn(move || {
         loop {
             if RESIZED.compare_and_swap(true, false, atomic::Ordering::SeqCst) {
                 let mut ws: ffi::WinSize;
@@ -37,7 +36,7 @@ pub fn send_resizes_to(
 
                 size_mailbox.send((ws.ws_col as usize, ws.ws_row as usize));
             }
-            mioco.sleep(10);
+            mioco::sleep(10);
         }
     });
 

@@ -18,7 +18,7 @@ lazy_static = "0.1.15"
 libc = "0.1.12"
 log = "0.3.2"
 md5 = "0.1.1"
-mio = "0.4.3"
+mio = { git = "https://github.com/dpc/mio", rev="c4a5b9e" }
 mioco = { git = "https://github.com/dpc/mioco.git" }
 nix = "0.4.1"
 rustbox = "0.7.1"

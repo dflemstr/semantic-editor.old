@@ -34,8 +34,8 @@ fn main() {
 }
 
 fn edit() {
-    mioco::start(move |mioco| {
-        let t = term::Term::new(mioco).unwrap();
+    mioco::spawn(move || {
+        let t = term::Term::new().unwrap();
 
         loop {
             let event = t.events().read();

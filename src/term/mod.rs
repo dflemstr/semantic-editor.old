@@ -31,7 +31,7 @@ pub enum Error {
 }
 
 impl Term {
-    pub fn new(mioco: &mut mioco::MiocoHandle) -> Result<Self, Error> {
+    pub fn new() -> Result<Self, Error> {
         use std::os::unix::io::IntoRawFd;
         use std::io::{Read,Write};
 
@@ -53,10 +53,10 @@ impl Term {
         let (events_send, events_recv) = mioco::mailbox();
         let (resize_send, resize_recv) = mioco::mailbox();
 
-        try!(resize::send_resizes_to(tty_fd, mioco, resize_send));
+        try!(resize::send_resizes_to(tty_fd, resize_send));
 
-        mioco.spawn(move |mioco| {
-            let resize_recv = mioco.wrap(resize_recv);
+        mioco::spawn(move || {
+            let resize_recv = mioco::wrap(resize_recv);
             loop {
                 let (width, height) = resize_recv.read();
                 events_send.send(Event::Resized(width, height));
@@ -65,7 +65,7 @@ impl Term {
 
         Ok(Term {
             _capture: capture,
-            events_recv: mioco.wrap(events_recv),
+            events_recv: mioco::wrap(events_recv),
         })
     }
 
