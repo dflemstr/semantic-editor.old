@@ -15,7 +15,6 @@ static TTY_LOCK: atomic::AtomicBool = atomic::ATOMIC_BOOL_INIT;
 
 pub struct Term {
     _capture: captured::CapturedTerm,
-    _tty_file: fs::File,
     tty: mioco::EventSource<mio::Io>,
     events_recv: mioco::EventSource<mioco::MailboxInnerEnd<Event>>,
 }
@@ -34,7 +33,7 @@ pub enum Error {
 
 impl Term {
     pub fn new(mioco: &mut mioco::MiocoHandle) -> Result<Self, Error> {
-        use std::os::unix::io::AsRawFd;
+        use std::os::unix::io::IntoRawFd;
         use std::io::{Read,Write};
 
         if TTY_LOCK.compare_and_swap(false, true, atomic::Ordering::SeqCst) {
@@ -47,7 +46,7 @@ impl Term {
                 .read(true)
                 .open("/dev/tty"));
 
-        let tty_fd = tty_file.as_raw_fd();
+        let tty_fd = tty_file.into_raw_fd();
         try!(fcntl::fcntl(tty_fd, fcntl::FcntlArg::F_SETFL(fcntl::O_NONBLOCK)));
         let tty = mioco.wrap(mio::Io::from_raw_fd(tty_fd));
 
@@ -60,7 +59,6 @@ impl Term {
 
         let term = Term {
             _capture: capture,
-            _tty_file: tty_file,
             tty: tty,
             events_recv: mioco.wrap(events_recv),
         };
@@ -86,7 +84,6 @@ impl Drop for Term {
         TTY_LOCK.store(false, atomic::Ordering::SeqCst);
     }
 }
-
 
 impl From<io::Error> for Error {
     fn from(e: io::Error) -> Self {
