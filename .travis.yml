@@ -1,7 +1,7 @@
 language: rust
 rust:
-  - stable
-  - beta
+#  - stable
+#  - beta
   - nightly
 os:
   - linux
@@ -33,10 +33,10 @@ before_install:
 
 sudo: false
 
-matrix:
-  allow_failures:
-    - rust: stable
-    - rust: beta
+#matrix:
+#  allow_failures:
+#    - rust: stable
+#    - rust: beta
 
 before_deploy:
   - cargo build --release
